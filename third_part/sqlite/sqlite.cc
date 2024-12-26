@@ -1,7 +1,6 @@
 #include "sqlite.h"
 
-#include <sqlite3.h>
-
+namespace MyOS {
 CSqlite::CSqlite(void)
 :db_ptr_(nullptr)
 {
@@ -27,7 +26,7 @@ CSqlite::exec(const std::string &sql, std::string &err_msg)
     }
 
     char *msg = nullptr;
-    int ret = sqlite3_exec(db_ptr_ , sql.c_str() ,0 ,0, &msg); 
+    int ret = sqlite3_exec(db_ptr_ , sql.c_str() ,callback ,nullptr, &msg); 
     err_msg = msg;
 
     return ret;
@@ -40,4 +39,16 @@ CSqlite::close(void)
         return 0;
     }
     return sqlite3_close(db_ptr_);
+}
+
+int 
+CSqlite::callback(void *NotUsed, int argc, char **argv, char **azColName)
+{
+    for(int i = 0; i < argc; ++i){
+        printf("%s = %s\n", azColName[i], argv[i] ? argv[i] : "NULL");
+    }
+    printf("\n");
+    return 0;
+}
+
 }
